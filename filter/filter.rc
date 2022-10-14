@@ -1,0 +1,82 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+CBFSFilterDialog DIALOG DISCARDABLE  22, 17, 334, 300
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Filter"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "Install Driver...",btnInstall,11,6,69,14
+    PUSHBUTTON      "Uninstall Driver",btnUnnstall,11,29,69,14
+    PUSHBUTTON      "Attach Filter",btnRegisterCB,93,6,69,14,WS_DISABLED
+    PUSHBUTTON      "Detach Filter",btnUnregisterCB,93,28,69,14,WS_DISABLED
+    CONTROL         "",lblDriverStatus,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,
+                    170,7,149,33
+    EDITTEXT        edtMask,11,68,148,14,ES_AUTOHSCROLL
+    CONTROL         "List1",lstRules,"SysListView32",LVS_REPORT | WS_BORDER | 
+                    WS_TABSTOP,8,111,318,157
+    CTEXT           "Active Rules",IDC_STATIC,109,92,106,8
+    COMBOBOX        cbFlags,171,68,95,123,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "Remove Selected",btnRemove,129,276,75,14
+    PUSHBUTTON      "Accept",btnAcceptRule,276,68,50,14
+    LTEXT           "Mask",IDC_STATIC,14,54,107,8
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    CBFSFilterDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 8
+        RIGHTMARGIN, 326
+        BOTTOMMARGIN, 299
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Neutral resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
