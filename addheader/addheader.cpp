@@ -162,21 +162,6 @@ public:
             VirtualFree(mHeader, mHeaderSize, MEM_DECOMMIT);
     }
 
-    void Init(DWORD Value)
-    {
-        if (mHeaderSize == 0)
-        {
-            mHeader = (PBYTE)VirtualAlloc(NULL, Value, MEM_COMMIT, PAGE_READWRITE);
-            mHeaderSize = Value;
-        }
-
-        if (mHeaderSize > strlen(MagicString)) 
-        {
-            ZeroMemory(mHeader, mHeaderSize);
-            CopyMemory(mHeader, MagicString, strlen(MagicString));
-        }
-    }
-
     void Init(HANDLE FileHandle)
     {
         OVERLAPPED Overlapped = {0};
@@ -253,12 +238,6 @@ public:
         return (mInitialized ? mHeaderSize : 0);
     }
 
-    void SetHeaderSize(DWORD Value)
-    {
-        mHeaderSize = Value;
-        ASSERT(mHeaderSize != 0);
-    }
-
 private:
     BOOL mInitialized;
     PBYTE mHeader;
@@ -319,16 +298,15 @@ public:
 
 	void SetAllocation(INT64 Size)
 	{
-		TCHAR text[32];
 		FILE_ALLOCATION_INFO Info;
-		DWORD Error;
 
 		Info.AllocationSize.QuadPart = Size;
 
-		if (!SetFileInformationByHandle(mHandle, FileAllocationInfo, &Info, sizeof(FILE_ALLOCATION_INFO))) {
-
-			Error = GetLastError();
-			_stprintf(text, _T("SetAllocation ERROR (%d)!!!!"), Error);
+		if (!SetFileInformationByHandle(mHandle, FileAllocationInfo, &Info, sizeof(FILE_ALLOCATION_INFO))) 
+        {
+            TCHAR text[32];
+			
+			_stprintf(text, _T("SetAllocation ERROR (%d)!!!!"), GetLastError());
 			AddToLog(text);
 		}
 	}
@@ -677,7 +655,7 @@ int EncryptContext::EncryptFile()
 int EncryptContext::DecryptFile()
 {
     DWORD Completed = 0;
-    __int64 CurrPos, CurSize;
+    __int64 CurrPos;
     OVERLAPPED Overlapped;
     DWORD Error = NO_ERROR;
     TCHAR text[MAX_PATH * 2];
@@ -685,21 +663,22 @@ int EncryptContext::DecryptFile()
 
     if (mHandle != INVALID_HANDLE_VALUE)
     {
-        CurrPos = 0;
+        const auto headerSize = GetHeaderSize();
 
-        CurSize = GetCurrentSize();
- 
+        CurrPos = headerSize;
+
         VirtualAlloc(mBuffer, mBufferSize, MEM_COMMIT, PAGE_READWRITE);
 
         BytesToRead = mBufferSize;
 
-        while (CurrPos < (CurSize - GetHeaderSize()))
+        const auto CurSize = GetCurrentSize();
+
+        while (CurrPos < CurSize)
         {
             // reading internal buffer
             memset(&Overlapped, 0, sizeof(Overlapped));
             Overlapped.Offset = (DWORD)(CurrPos & 0xFFFFFFFF);
             Overlapped.OffsetHigh = (DWORD)((CurrPos >> 32) & 0xFFFFFFFF);
-            Overlapped.Offset += GetHeaderSize();
 
             if (!ReadFile(mHandle, mBuffer, BytesToRead, &Completed,
                 &Overlapped) || (Completed == 0))
@@ -716,8 +695,11 @@ int EncryptContext::DecryptFile()
 
             // writing internal buffer
             memset(&Overlapped, 0, sizeof(Overlapped));
-            Overlapped.Offset = (DWORD)(CurrPos & 0xFFFFFFFF);
-            Overlapped.OffsetHigh = (DWORD)((CurrPos >> 32) & 0xFFFFFFFF);
+
+            const auto writePosition = static_cast<long long>(CurrPos - headerSize);
+
+            Overlapped.Offset = (DWORD)(writePosition & 0xFFFFFFFF);
+            Overlapped.OffsetHigh = (DWORD)((writePosition >> 32) & 0xFFFFFFFF);
 
             if (!WriteFile(mHandle, mBuffer, mBufferSize, &Completed, &Overlapped))
             {
@@ -726,7 +708,7 @@ int EncryptContext::DecryptFile()
                 AddToLog(text);
                 break;
             }
-            _stprintf(text, _T("DecryptFile: Write Offset(%08x) Size(%04x) Complete(%04x)"), (DWORD)Overlapped.Offset, mBufferSize, Completed);
+            _stprintf(text, _T("DecryptFile: Write Offset(%08x) Size(%04x) Complete(%04x)"), (DWORD)writePosition, mBufferSize, Completed);
             AddToLog(text);
 
             CurrPos += min(Completed, mBufferSize);

@@ -26,7 +26,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="copy ..\..\..\lib\cbfsfilter20.dll $(OutDir)"
+				CommandLine="copy ..\..\..\lib\cbfsfilter22.dll $(OutDir)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -114,7 +114,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="copy ..\..\..\lib\cbfsfilter20.dll $(OutDir)"
+				CommandLine="copy ..\..\..\lib\cbfsfilter22.dll $(OutDir)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
